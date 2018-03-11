@@ -1,0 +1,24 @@
+html,body {
+  height:100%
+}
+
+body {
+  padding-top: 5rem;
+}
+
+/* .bkgimg {
+  background-image: url(http://moziru.com/images/celebration-clipart-birthday-balloon-11.png);
+  background-repeat: no-repeat;
+  background-size: cover;
+  height: 100%;
+} */
+
+
+.jumbo {
+  background-color: black;
+  color : white;
+}
+
+
+
+
