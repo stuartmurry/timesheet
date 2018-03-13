@@ -40,7 +40,7 @@
             <p>A Comprehensive Directory of Employee Billable Hours</p>
         </div>
         <div class="card">
-            <div class="card-header bg-primary text-white">Employee</div>
+            <div class="card-header bg-primary text-white">Employee <button type="button" class="btn btn-success" id="AddEmployee" >Add</button></div>
             <div class="card-body">
                 <table class="table">
                     <thead>
@@ -60,10 +60,11 @@
             </div>
         </div>
 
-        <div class="card mt-2">
-            <div class="card-header bg-primary text-white">Add Employee</div>
+        <div id="Employee" class="card mt-2 hidden">
+            <div class="card-header bg-primary text-white">Employee</div>
             <div class="card-body">
                 <form>
+                    <input type="hidden" id="ID" value="">
                     <div class="form-group">
                         <label for="exampleInputEmail1">Employee Name</label>
                         <input type="text" class="form-control" id="EmployeeName" aria-describedby="employeeName" placeholder="Employee Name">
