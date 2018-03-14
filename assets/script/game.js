@@ -28,10 +28,27 @@ $(document).ready(function() {
         return m;
       },
       computeMonthlyBilled: function(rate) {
-        console.log("Months Worked");
-        console.log(rate);
+        console.log("Compute Monthly Billed");
+
+        var dateNow = moment();
+
+        var daysInMonth = moment().daysInMonth();
+        console.log(daysInMonth);
+        var daysWorked = moment()
+          .startOf("day")
+          .format("DD");
+        console.log(parseInt(rate));
+
+        var asdf =
+          parseInt(rate) / parseInt(daysInMonth) * parseInt(daysWorked);
+
+        console.log("Months billed");
+        console.log(asdf);
+
+        return Math.round(asdf * 100) / 100;
       },
       submit: function() {
+        console.log("Submitting...");
         var _this = this;
         var employee = {
           Employee: $("#EmployeeName").val(),
@@ -39,7 +56,22 @@ $(document).ready(function() {
           StartDate: moment($("#StartDate").val()).unix(),
           MonthlyRate: $("#MonthlyRate").val()
         };
-        if ($("#ID").val()) {
+        var idVal = $("#ID").val();
+        console.log("idVal");
+        console.log(idVal);
+        if (idVal) {
+          this.database
+            .ref("Employees/" + idVal.trim())
+            .set(employee)
+            .then(
+              function(data) {
+                console.log("Data submitted...");
+              },
+              function(err) {
+                alert(err);
+              }
+            );
+
           // Has ID VAL
         } else {
           // Create New
@@ -78,6 +110,28 @@ $(document).ready(function() {
             }
           );
       },
+      update: function(snapshot) {
+        console.log('update....');
+        console.log(snapshot);
+        var id = snapshot.key;
+        console.log('Value');
+        
+        var empl = snapshot.val();
+        var arr = [];
+        arr.push("<td>" + empl.Employee + "</td>");
+        arr.push("<td>" + empl.Role + "</td>");
+        arr.push("<td>" + moment.unix(empl.StartDate).format("MM/DD/YYYY") + "</td>");
+        arr.push("<td>" + this.computeMonthsWorked(empl.StartDate) + "</td>");
+        arr.push("<td> $" + empl.MonthlyRate + "</td>");
+        arr.push("<td>" + this.computeMonthlyBilled(empl.MonthlyRate) + "</td>");
+        arr.push(
+          '<td><button id="delete' +
+            empl.id +
+            '" type="button" class="btn btn-danger">Delete</button></td>'
+        );
+
+        $("#" + id).html(arr.join(''));
+      },
       create: function() {
         this.clear();
         $("#Employee").removeClass("hidden");
@@ -99,7 +153,7 @@ $(document).ready(function() {
           StartDate: moment.unix(ts.StartDate).format("MM/DD/YYYY"),
           MonthlyRate: ts.MonthlyRate,
           MonthsWorked: this.computeMonthsWorked(ts.StartDate),
-          MonthlyBilled: this.computeMonthlyBilled(ts.StartDate)
+          MonthlyBilled: this.computeMonthlyBilled(ts.MonthlyRate)
         };
 
         console.log(ts);
@@ -109,7 +163,7 @@ $(document).ready(function() {
         arr.push("<td>" + empl.Role + "</td>");
         arr.push("<td>" + empl.StartDate + "</td>");
         arr.push("<td>" + empl.MonthsWorked + "</td>");
-        arr.push("<td>" + empl.MonthlyRate + "</td>");
+        arr.push("<td> $" + empl.MonthlyRate + "</td>");
         arr.push("<td>" + empl.MonthlyBilled + "</td>");
         arr.push(
           '<td><button id="delete' +
@@ -121,7 +175,7 @@ $(document).ready(function() {
 
         $("#tbody").append(arr.join(""));
         $("#" + empl.id).on("click", function(e) {
-          $("#Id").val(empl.id);
+          $("#ID").val(empl.id);
           $("#EmployeeName").val(empl.Employee);
           $("#Role").val(empl.Role);
           $("#StartDate").val(empl.StartDate);
@@ -145,6 +199,11 @@ $(document).ready(function() {
   timesheet.getEmployees().on("child_removed", function(snapshot) {
     timesheet.remove(snapshot.key);
   });
+
+  timesheet.getEmployees().on("child_changed", function(snapshot) {
+    timesheet.update(snapshot);
+  });
+
 
   $("#submit").on("click", function(evt) {
     timesheet.submit();
